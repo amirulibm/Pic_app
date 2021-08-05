@@ -1,83 +1,69 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:t1/job_list.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:t1/login.dart';
 
-void main() {
-  runApp(MaterialApp(
-    debugShowCheckedModeBanner: false,
-    theme: ThemeData(primarySwatch: Colors.red),
-    home: MyApp(),
-  ));
-}
+void main() => runApp(MyApp());
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   static final String title = 'WikiCareer Pic';
   @override
-  _State createState() => _State();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: title,
+      debugShowCheckedModeBanner: false,
+      home: MainPage(),
+      theme: ThemeData(accentColor: Colors.white70),
+    );
+  }
 }
 
-class _State extends State<MyApp> {
-  TextEditingController nameController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
+class MainPage extends StatefulWidget {
+  @override
+  _MainPageState createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  late SharedPreferences sharedPreferences;
+
+  @override
+  void initState() {
+    super.initState();
+    checkLoginStatus();
+  }
+
+  checkLoginStatus() async {
+    sharedPreferences = await SharedPreferences.getInstance();
+    if (sharedPreferences.getString("token") == null) {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (BuildContext context) => LoginPage()),
+          (Route<dynamic> route) => false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('WikiCareer Pic'),
-        ),
-        body: Padding(
-            padding: EdgeInsets.all(10),
-            child: ListView(
-              children: <Widget>[
-                Container(
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      'Sign in',
-                      style: TextStyle(fontSize: 20),
-                    )),
-                Container(
-                  padding: EdgeInsets.all(10),
-                  child: TextField(
-                    controller: nameController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Email',
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                  child: TextField(
-                    obscureText: true,
-                    controller: passwordController,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      labelText: 'Password',
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 40,
-                ),
-                Container(
-                    height: 50,
-                    padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                    child: RaisedButton(
-                        textColor: Colors.white,
-                        color: Colors.red,
-                        child: Text('Login'),
-                        onPressed: () {
-                          // print(nameController.text);
-                          // print(passwordController.text);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => FilterNetworkListPage(),
-                            ),
-                          );
-                        })),
-              ],
-            )));
+      appBar: AppBar(
+        title: Text("WikiCareer PIC", style: TextStyle(color: Colors.white)),
+        actions: <Widget>[
+          FlatButton(
+            onPressed: () {
+              sharedPreferences.clear();
+              sharedPreferences.commit();
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => LoginPage()),
+                  (Route<dynamic> route) => false);
+            },
+            child: Text("Log Out", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+      body: Center(child: Text("Main Page")),
+      drawer: Drawer(),
+    );
   }
 }
