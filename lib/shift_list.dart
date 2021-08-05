@@ -8,7 +8,6 @@ import 'package:t1/model/job_model.dart';
 import 'package:t1/model/shift_model.dart';
 import 'package:t1/search.dart';
 
-
 class Shiftlistpage extends StatefulWidget {
   final Job value;
 
@@ -20,6 +19,7 @@ class Shiftlistpage extends StatefulWidget {
 
 class ShiftlistpageState extends State<Shiftlistpage> {
   List<Shift> shift = [];
+  List<Shift> oriShift = [];
   String query = '';
   Timer? debouncer;
 
@@ -47,9 +47,9 @@ class ShiftlistpageState extends State<Shiftlistpage> {
   }
 
   Future init() async {
-    final shift = await ShiftApi.getShift(query);
-
-    setState(() => this.shift = shift);
+    oriShift = await ShiftApi.getShift(widget.value.job_code);
+    shift = oriShift;
+    setState(() {});
   }
 
   @override
@@ -81,14 +81,18 @@ class ShiftlistpageState extends State<Shiftlistpage> {
         onChanged: searchBook,
       );
 
-  Future searchBook(String query) async => debounce(() async {
-        final books = await ShiftApi.getShift(query);
+  Future searchBook(String queri) async => debounce(() async {
+        shift = shift
+            .where((element) => element.attendance_syifs_job_code
+                .toLowerCase()
+                .contains(query.toLowerCase()))
+            .toList();
 
         if (!mounted) return;
 
         setState(() {
-          this.query = query;
-          this.shift = shift;
+          query = queri;
+          shift = shift;
         });
       });
 

@@ -134,7 +134,11 @@ class _DetailScreenState extends State<DetailScreen> {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Scanner()),
+                MaterialPageRoute(
+                    builder: (context) => Scanner(
+                          shift: widget.item.attendance_syifs_code,
+                          btn: '4',
+                        )),
               );
             },
           ),
