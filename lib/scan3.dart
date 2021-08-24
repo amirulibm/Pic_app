@@ -19,6 +19,52 @@ class Scanner extends StatefulWidget {
 }
 
 class _ScannerState extends State<Scanner> {
+  TextEditingController _textFieldController = TextEditingController();
+  String codeDialog;
+  String valueText;
+
+  Future<void> _displayTextInputDialog(BuildContext context) async {
+    return showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Key In IC Number'),
+            content: TextField(
+              onChanged: (value) {
+                setState(() {
+                  valueText = value;
+                });
+              },
+              controller: _textFieldController,
+              decoration: InputDecoration(hintText: "IC Number"),
+            ),
+            actions: <Widget>[
+              FlatButton(
+                color: Colors.red,
+                textColor: Colors.white,
+                child: Text('CANCEL'),
+                onPressed: () {
+                  setState(() {
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+              FlatButton(
+                color: Colors.green,
+                textColor: Colors.white,
+                child: Text('Submit'),
+                onPressed: () {
+                  setState(() {
+                    codeDialog = valueText;
+                    Navigator.pop(context);
+                  });
+                },
+              ),
+            ],
+          );
+        });
+  }
+
   Future getshiftlist() async {
     var url = Uri.parse(
         'https://wikicareer.com.my/api/list_attendance/${widget.shift}');
@@ -81,6 +127,16 @@ class _ScannerState extends State<Scanner> {
     return Scaffold(
       appBar: AppBar(
         title: Text('${widget.date} \t SHIFT: ${widget.attshift}'),
+        actions: <Widget>[
+          Padding(
+              padding: EdgeInsets.only(right: 20.0),
+              child: GestureDetector(
+                onTap: () {
+                  _displayTextInputDialog(context);
+                },
+                child: Icon(Icons.more_vert),
+              )),
+        ],
       ),
       body: Stack(
         children: [
