@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
 import 'package:flutter_beep/flutter_beep.dart';
 import 'package:http/http.dart' as http;
+import 'package:t1/api/scan_api.dart';
 
 class Scanner extends StatefulWidget {
   final String shift;
@@ -327,6 +328,7 @@ class _ScannerState extends State<Scanner> {
     );
   }
 
+
   void _onQRViewCreated(QRViewController controller) {
     var msg;
     this.controller = controller;
@@ -334,6 +336,9 @@ class _ScannerState extends State<Scanner> {
       controller.pauseCamera();
       var response =
           await ScanApi.scan(widget.shift, scanData.code, widget.btn);
+      if(response is ScanResponse){
+        print(response.ic);
+      }
       print(response);
       result = scanData;
       FlutterBeep.beep();
